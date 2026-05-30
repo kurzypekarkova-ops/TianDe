@@ -1,0 +1,6 @@
+{
+  "name": "TianDe AI Asistent",
+  "description": "Interní pomocník pro TOP lídry a spolupracovníky TianDe pro doporučení produktů a tvorbu materiálů.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
