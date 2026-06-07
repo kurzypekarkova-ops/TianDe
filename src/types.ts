@@ -15,7 +15,7 @@ export interface Video {
   category: string;
 }
 
-export type Pillar = 'recommendations' | 'content' | 'videos' | 'objections' | 'education';
+export type Pillar = 'recommendations' | 'products' | 'content' | 'videos' | 'objections' | 'education';
 
 export interface ChatMessage {
     role: 'user' | 'model';

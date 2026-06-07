@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { RecommendationPillar } from './components/RecommendationPillar';
+import { ProductsPillar } from './components/ProductsPillar';
 import { ContentCreatorPillar } from './components/ContentCreatorPillar';
 import { VideoLibraryPillar } from './components/VideoLibraryPillar';
 import { ObjectionsPillar } from './components/ObjectionsPillar';
@@ -19,6 +20,7 @@ export default function App() {
   const renderPillar = () => {
     switch (activePillar) {
       case 'recommendations': return <RecommendationPillar />;
+      case 'products': return <ProductsPillar />;
       case 'content': return <ContentCreatorPillar />;
       case 'videos': return <VideoLibraryPillar />;
       case 'objections': return <ObjectionsPillar />;

@@ -8,7 +8,8 @@ import {
   BookOpen, 
   ChevronRight,
   Menu,
-  X
+  X,
+  ShoppingBag
 } from 'lucide-react';
 import { Pillar } from '../types';
 
@@ -23,6 +24,12 @@ const navItems: { id: Pillar; label: string; icon: React.ReactNode; description:
     label: 'Nováčci', 
     icon: <Package className="w-5 h-5" />,
     description: 'Doporučení produktů'
+  },
+  { 
+    id: 'products', 
+    label: 'Produkty', 
+    icon: <ShoppingBag className="w-5 h-5" />,
+    description: 'Složky ze sortimentu'
   },
   { 
     id: 'content', 
@@ -70,7 +77,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePillar, setActivePillar 
         className="fixed lg:relative z-40 h-screen bg-white border-r border-slate-200 overflow-hidden flex flex-col"
       >
         <div className="w-[280px] h-full flex flex-col">
-          <div className="p-8 pt-20 lg:pt-8 border-b border-slate-100 flex flex-col gap-1">
+          <div className="p-8 pl-16 lg:pl-8 pt-20 lg:pt-8 border-b border-slate-100 flex flex-col gap-1">
             <div className="flex items-baseline gap-2">
               <span className="text-2xl font-black tracking-tighter text-tiande-blue">tianDe</span>
               <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">AI Assistant</span>
@@ -120,12 +127,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePillar, setActivePillar 
             <div className="p-4 border border-slate-100 rounded-lg bg-slate-50">
               <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">Uživatel</p>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-tiande-blue flex items-center justify-center text-white text-xs font-bold shadow-md shadow-tiande-blue/20">
-                  TL
+                <div className="w-8 h-8 rounded-full bg-pink-600 flex items-center justify-center text-white text-[11px] font-black shadow-md shadow-pink-600/20">
+                  IN
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-800">TOP Lídr</p>
-                  <div className="flex items-center gap-1.5 text-[10px] text-green-500 font-bold uppercase">
+                  <p className="text-xs font-bold text-slate-800">Ivana Nohavová</p>
+                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">TOP Lídr</p>
+                  <div className="flex items-center gap-1.5 text-[9px] text-green-500 font-bold uppercase mt-0.5">
                     <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
                     Online
                   </div>
