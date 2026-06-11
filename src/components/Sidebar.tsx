@@ -9,7 +9,14 @@ import {
   ChevronRight,
   Menu,
   X,
-  ShoppingBag
+  ShoppingBag,
+  Sparkles,
+  Flame,
+  Send,
+  Layers,
+  Calculator,
+  RefreshCw,
+  Mail
 } from 'lucide-react';
 import { Pillar } from '../types';
 
@@ -18,43 +25,120 @@ interface SidebarProps {
   setActivePillar: (pillar: Pillar) => void;
 }
 
-const navItems: { id: Pillar; label: string; icon: React.ReactNode; description: string }[] = [
+interface NavItem {
+  id: Pillar;
+  label: string;
+  icon: React.ReactNode;
+  description: string;
+  category: 'clients' | 'content' | 'products' | 'business';
+}
+
+const navItems: NavItem[] = [
+  // 1. Prodej & Klienti
   { 
-    id: 'recommendations', 
-    label: 'Nováčci', 
-    icon: <Package className="w-5 h-5" />,
-    description: 'Doporučení produktů'
+    id: 'reactivation', 
+    label: 'Oživovač zákazníků', 
+    icon: <RefreshCw className="w-4 h-4 text-emerald-500 font-extrabold" />,
+    description: 'Smart Follow-up',
+    category: 'clients'
   },
   { 
-    id: 'products', 
-    label: 'Produkty', 
-    icon: <ShoppingBag className="w-5 h-5" />,
-    description: 'Složky ze sortimentu'
+    id: 'scripts', 
+    label: 'Předlohy na konverzaci', 
+    icon: <Send className="w-4 h-4 text-emerald-500 font-extrabold" />,
+    description: 'Vztahové zprávy',
+    category: 'clients'
   },
   { 
-    id: 'content', 
-    label: 'Materiály', 
-    icon: <PenTool className="w-5 h-5" />,
-    description: 'Tvorba obsahu'
-  },
-  { 
-    id: 'videos', 
-    label: 'Videotéka', 
-    icon: <Video className="w-5 h-5" />,
-    description: 'Školení a ukázky'
+    id: 'mailing', 
+    label: 'Mailingový asistent', 
+    icon: <Mail className="w-4 h-4 text-indigo-500 font-extrabold" />,
+    description: 'E-maily & Newslettery',
+    category: 'clients'
   },
   { 
     id: 'objections', 
     label: 'Námitky', 
-    icon: <MessageCircle className="w-5 h-5" />,
-    description: 'Jak reagovat'
+    icon: <MessageCircle className="w-4 h-4 text-slate-500" />,
+    description: 'Jak reagovat',
+    category: 'clients'
+  },
+
+  // 2. Obsah & Sítě
+  { 
+    id: 'storycookbook', 
+    label: 'Příběhy, které prodávají', 
+    icon: <Layers className="w-4 h-4 text-pink-500 font-extrabold" />,
+    description: 'Vícekrokové scénáře',
+    category: 'content'
+  },
+  { 
+    id: 'content', 
+    label: 'Materiály', 
+    icon: <PenTool className="w-4 h-4 text-slate-500" />,
+    description: 'Tvorba obsahu',
+    category: 'content'
+  },
+  { 
+    id: 'hooks', 
+    label: 'Hooky na sítích', 
+    icon: <Flame className="w-4 h-4 text-orange-500 font-extrabold" />,
+    description: 'Social Media Hooky',
+    category: 'content'
+  },
+
+  // 3. Diagnostika & Produkty
+  { 
+    id: 'diagnosis', 
+    label: 'Diagnostika (Kvíz)', 
+    icon: <Sparkles className="w-4 h-4 text-pink-500 font-extrabold" />,
+    description: 'Bylinný kvíz na míru',
+    category: 'products'
+  },
+  { 
+    id: 'products', 
+    label: 'Encyklopedie složení', 
+    icon: <ShoppingBag className="w-4 h-4 text-slate-500" />,
+    description: 'Složky ze sortimentu',
+    category: 'products'
+  },
+  { 
+    id: 'recommendations', 
+    label: 'Start Nováčka', 
+    icon: <Package className="w-4 h-4 text-slate-500" />,
+    description: 'Doporučení produktů',
+    category: 'products'
+  },
+
+  // 4. Byznys & Vzdělávání
+  { 
+    id: 'calculator', 
+    label: 'Kalkulačka marží', 
+    icon: <Calculator className="w-4 h-4 text-blue-500 font-extrabold" />,
+    description: 'Úspory & Provizeík',
+    category: 'business'
   },
   { 
     id: 'education', 
-    label: 'Vzdělávání', 
-    icon: <BookOpen className="w-5 h-5" />,
-    description: 'Produktové řady'
+    label: 'Produktové řady', 
+    icon: <BookOpen className="w-4 h-4 text-slate-500" />,
+    description: 'Produktové řady',
+    category: 'business'
   },
+  { 
+    id: 'videos', 
+    label: 'Videotéka lídrů', 
+    icon: <Video className="w-4 h-4 text-slate-500" />,
+    description: 'Školení a ukázky',
+    category: 'business'
+  },
+];
+
+const categories = [
+  { id: 'clients', label: '💬 Prodej & Klienti' },
+  { id: 'content', label: '✨ Obsah & Sítě' },
+  { id: 'products', label: '🛍️ Kvíz & Produkty' },
+  { id: 'business', label: '📊 Vlastní růst & Byznys' }
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({ activePillar, setActivePillar }) => {
@@ -85,42 +169,54 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePillar, setActivePillar 
             <p className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.2em] mt-1">Interní Nástroj</p>
           </div>
 
-          <nav className="flex-1 p-6 space-y-4 overflow-y-auto">
-            <div className="mb-4">
-              <h2 className="label-caps mb-4 opacity-50">Hlavní Pilar</h2>
-              <div className="space-y-1">
-                {navItems.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      setActivePillar(item.id);
-                      if (window.innerWidth < 1024) setIsOpen(false);
-                    }}
-                    className={`w-full flex items-center gap-4 p-3 rounded-lg transition-all duration-200 group relative ${
-                      activePillar === item.id 
-                        ? 'bg-slate-50 text-tiande-blue' 
-                        : 'text-slate-500 hover:text-tiande-blue hover:bg-slate-50/50'
-                    }`}
-                    id={`nav-${item.id}`}
-                  >
-                    <div className={`transition-colors ${activePillar === item.id ? 'text-tiande-blue' : 'text-slate-300 group-hover:text-tiande-blue/50'}`}>
-                      {item.icon}
-                    </div>
-                    <div className="text-left">
-                      <p className={`font-bold text-xs uppercase tracking-widest ${activePillar === item.id ? 'text-tiande-blue' : ''}`}>
-                        {item.label}
-                      </p>
-                    </div>
-                    {activePillar === item.id && (
-                      <motion.div 
-                        layoutId="active-indicator"
-                        className="absolute left-0 w-1 h-6 bg-tiande-blue rounded-r-full"
-                      />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
+          <nav className="flex-1 p-6 space-y-6 overflow-y-auto">
+            {categories.map((cat) => {
+              const items = navItems.filter(item => item.category === cat.id);
+              if (items.length === 0) return null;
+
+              return (
+                <div key={cat.id} className="space-y-1.5">
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400/80 mb-2 pl-2">
+                    {cat.label}
+                  </h3>
+                  <div className="space-y-0.5">
+                    {items.map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          setActivePillar(item.id);
+                          if (window.innerWidth < 1024) setIsOpen(false);
+                        }}
+                        className={`w-full flex items-center justify-between p-2 pl-3 rounded-lg transition-all duration-200 group relative ${
+                          activePillar === item.id 
+                            ? 'bg-slate-50 text-tiande-blue font-bold' 
+                            : 'text-slate-500 hover:text-tiande-blue hover:bg-slate-50/40'
+                        }`}
+                        id={`nav-${item.id}`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`transition-colors shrink-0 ${activePillar === item.id ? 'text-tiande-blue' : 'text-slate-400/70 group-hover:text-tiande-blue/50'}`}>
+                            {item.icon}
+                          </div>
+                          <span className={`text-[11px] uppercase tracking-wider ${activePillar === item.id ? 'text-tiande-blue font-extrabold' : 'font-medium'}`}>
+                            {item.label}
+                          </span>
+                        </div>
+                        
+                        {activePillar === item.id ? (
+                          <motion.div 
+                            layoutId="active-indicator"
+                            className="absolute left-0 w-1 h-5 bg-tiande-blue rounded-r-full"
+                          />
+                        ) : (
+                          <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-slate-300" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </nav>
 
           <div className="p-6 border-t border-slate-100">
@@ -131,7 +227,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePillar, setActivePillar 
                   IN
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-800">Ivana Nohavová</p>
+                  <p className="text-xs font-bold text-slate-800">Ivana Nohovová</p>
                   <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">TOP Lídr</p>
                   <div className="flex items-center gap-1.5 text-[9px] text-green-500 font-bold uppercase mt-0.5">
                     <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />

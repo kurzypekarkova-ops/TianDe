@@ -11,6 +11,13 @@ import { ContentCreatorPillar } from './components/ContentCreatorPillar';
 import { VideoLibraryPillar } from './components/VideoLibraryPillar';
 import { ObjectionsPillar } from './components/ObjectionsPillar';
 import { EducationPillar } from './components/EducationPillar';
+import { DiagnosisPillar } from './components/DiagnosisPillar';
+import { HooksPillar } from './components/HooksPillar';
+import { ScriptsPillar } from './components/ScriptsPillar';
+import { StoryCookbookPillar } from './components/StoryCookbookPillar';
+import { CalculatorPillar } from './components/CalculatorPillar';
+import { ReactivationPillar } from './components/ReactivationPillar';
+import { MailingAssistantPillar } from './components/MailingAssistantPillar';
 import { Pillar } from './types';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -25,6 +32,13 @@ export default function App() {
       case 'videos': return <VideoLibraryPillar />;
       case 'objections': return <ObjectionsPillar />;
       case 'education': return <EducationPillar />;
+      case 'diagnosis': return <DiagnosisPillar />;
+      case 'hooks': return <HooksPillar />;
+      case 'storycookbook': return <StoryCookbookPillar />;
+      case 'scripts': return <ScriptsPillar />;
+      case 'calculator': return <CalculatorPillar />;
+      case 'reactivation': return <ReactivationPillar />;
+      case 'mailing': return <MailingAssistantPillar />;
       default: return <RecommendationPillar />;
     }
   };
