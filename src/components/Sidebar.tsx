@@ -98,7 +98,7 @@ const businessGroups: GroupDetail[] = [
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({ activePillar, setActivePillar, appMode, setAppMode }) => {
-  const [isOpen, setIsOpen] = React.useState(true);
+  const [isOpen, setIsOpen] = React.useState(window.innerWidth >= 1024);
 
   const handleModeSwitch = (mode: 'customer' | 'business') => {
     setAppMode(mode);

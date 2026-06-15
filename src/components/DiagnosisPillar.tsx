@@ -557,6 +557,52 @@ export const DiagnosisPillar: React.FC = () => {
         </div>
       </header>
 
+      {activeTab === 'quiz' && (
+        <div className="mb-8 max-w-3xl mx-auto select-none">
+          <div className="flex items-center justify-between relative">
+            {/* Background progress line */}
+            <div className="absolute top-1/2 left-0 right-0 h-1 bg-slate-200/60 -translate-y-1/2 z-0 rounded-full" />
+            <div 
+              className="absolute top-1/2 left-0 h-1 bg-pink-500 -translate-y-1/2 z-0 rounded-full transition-all duration-500"
+              style={{ 
+                width: showResults ? '100%' : (activeDomain ? '50%' : '0%')
+              }} 
+            />
+            
+            {[
+              { step: 1, label: 'Výběr oblasti', desc: 'Vyberte test' },
+              { step: 2, label: 'Bleskový kvíz', desc: 'Odpovězte na dotazy' },
+              { step: 3, label: 'Fytorecept', desc: 'Doporučený plán' }
+            ].map((s) => {
+              const isCompleted = (s.step === 1 && (activeDomain || showResults)) || (s.step === 2 && showResults);
+              const isActive = (s.step === 1 && !activeDomain) || (s.step === 2 && activeDomain && !showResults) || (s.step === 3 && showResults);
+              
+              return (
+                <div key={s.step} className="flex flex-col items-center z-10 relative bg-slate-50/90 px-3 py-1 rounded-xl transition-all">
+                  <div 
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black border-2 transition-all duration-300 ${
+                      isCompleted 
+                        ? 'bg-pink-500 border-pink-500 text-white shadow-md shadow-pink-100' 
+                        : isActive 
+                          ? 'bg-white border-pink-500 text-pink-600 shadow-sm font-extrabold ring-4 ring-pink-500/10' 
+                          : 'bg-white border-slate-200 text-slate-400'
+                    }`}
+                  >
+                    {s.step}
+                  </div>
+                  <span className={`text-[10px] font-black uppercase mt-1.5 tracking-wider ${isActive ? 'text-pink-600' : isCompleted ? 'text-slate-700' : 'text-slate-400'}`}>
+                    {s.label}
+                  </span>
+                  <span className="text-[9px] font-bold text-slate-400 hidden sm:inline tracking-normal">
+                    {s.desc}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {activeTab === 'recipes' ? (
         // Saved Recipes List View
         <motion.div 

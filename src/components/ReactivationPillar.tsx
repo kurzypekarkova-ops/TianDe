@@ -140,6 +140,63 @@ export const ReactivationPillar: React.FC = () => {
         </div>
       </div>
 
+      {/* Visual Steps Progress Bar */}
+      <div className="mb-10 max-w-3xl mx-auto select-none">
+        <div className="flex items-center justify-between relative">
+          {/* Background line */}
+          <div className="absolute top-1/2 left-0 right-0 h-1 bg-slate-200/60 -translate-y-1/2 z-0 rounded-full" />
+          {/* Active progress line */}
+          <div 
+            className="absolute top-1/2 left-0 h-1 bg-emerald-500 -translate-y-1/2 z-0 rounded-full transition-all duration-500"
+            style={{ 
+              width: copiedText ? '100%' : (clientName !== 'Lucie' || vipUrl !== 'tiandeshop.cz/vip-lucie' ? '50%' : '25%')
+            }} 
+          />
+          
+          {[
+            { step: 1, label: 'Klientská situace', desc: 'Vyberte šablonu' },
+            { step: 2, label: 'Úprava proměnných', desc: 'Zadejte jméno & odkaz' },
+            { step: 3, label: 'Odeslání zprávy', desc: 'Zkopírujte do schránky' }
+          ].map((s) => {
+            let isActive = false;
+            let isCompleted = false;
+            if (s.step === 1) {
+              isActive = true;
+              isCompleted = true;
+            }
+            if (s.step === 2) {
+              isActive = clientName !== 'Lucie' || vipUrl !== 'tiandeshop.cz/vip-lucie' || favoriteLine !== 'Bio Rehab (proti padání vlasů)';
+              isCompleted = clientName.trim() !== '' && vipUrl.trim() !== '';
+            }
+            if (s.step === 3) {
+              isActive = copiedText;
+              isCompleted = copiedText;
+            }
+            return (
+              <div key={s.step} className="flex flex-col items-center z-10 relative bg-slate-50/90 px-3 py-1 rounded-xl transition-all">
+                <div 
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black border-2 transition-all duration-300 ${
+                    isCompleted 
+                      ? 'bg-emerald-500 border-emerald-500 text-white shadow-md shadow-emerald-100' 
+                      : isActive 
+                        ? 'bg-white border-emerald-500 text-emerald-600 shadow-sm font-extrabold ring-4 ring-emerald-500/10' 
+                        : 'bg-white border-slate-200 text-slate-400'
+                  }`}
+                >
+                  {s.step}
+                </div>
+                <span className={`text-[10px] font-black uppercase mt-1.5 tracking-wider ${isActive ? 'text-emerald-700 font-extrabold' : isCompleted ? 'text-slate-700' : 'text-slate-400'}`}>
+                  {s.label}
+                </span>
+                <span className="text-[9px] font-bold text-slate-400 hidden sm:inline tracking-normal">
+                  {s.desc}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Grid split */}
       <div className="grid lg:grid-cols-12 gap-8 items-start">
         
