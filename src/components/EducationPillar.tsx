@@ -17,10 +17,18 @@ import {
   Activity, 
   X, 
   Flame,
-  Info
+  Info,
+  Coins,
+  Gift,
+  Mail,
+  Calculator,
+  UserCheck,
+  Phone,
+  FileText
 } from 'lucide-react';
 import { PRODUCT_LINES } from '../data';
 import { PRODUCT_LINES_DETAILS, ProductLineDetail } from '../data/productLinesData';
+import { CORPORATE_PROMOTIONS, DECOINS_GIFTS, LETTERS_TEMPLATES } from '../data/promotionsAndLetters';
 import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
 
@@ -83,8 +91,18 @@ const academyModules: AcademyModule[] = [
   }
 ];
 
-export const EducationPillar: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'products' | 'academy'>('products');
+interface EducationPillarProps {
+  appMode?: 'customer' | 'business';
+}
+
+export const EducationPillar: React.FC<EducationPillarProps> = ({ appMode = 'customer' }) => {
+  const [activeTab, setActiveTab] = useState<'products' | 'academy' | 'promotions' | 'letters'>('products');
+
+  useEffect(() => {
+    if (appMode === 'customer' && (activeTab === 'academy' || activeTab === 'letters')) {
+      setActiveTab('products');
+    }
+  }, [appMode, activeTab]);
   
   // Product lines states
   const [selectedCategory, setSelectedCategory] = useState<string>('Vše');
@@ -99,6 +117,33 @@ export const EducationPillar: React.FC = () => {
   const [aiResponse, setAiResponse] = useState<string>('');
   const [aiLoading, setAiLoading] = useState<boolean>(false);
   const [copiedText, setCopiedText] = useState<string | null>(null);
+
+  // Promotions tab states
+  const [selectedPromoId, setSelectedPromoId] = useState<string>('decoins');
+  const [decoinCount, setDecoinCount] = useState<number>(40);
+
+  // Letters tab states
+  const [selectedLetterIdx, setSelectedLetterIdx] = useState<number>(0);
+  const [letterCustName, setLetterCustName] = useState<string>('Marie');
+  const [letterVIPId, setLetterVIPId] = useState<string>('8329412');
+  const [letterMentorName, setLetterMentorName] = useState<string>('Ivana Nohovová');
+  const [letterMentorPhone, setLetterMentorPhone] = useState<string>('+420 777 123 456');
+  const [letterFBGroup, setLetterFBGroup] = useState<string>('tianDe s láskou s Ivanou');
+  const [letterHeroProd, setLetterHeroProd] = useState<string>('Bio Rehab');
+  const [letterSavingEst, setLetterSavingEst] = useState<string>('1 200');
+
+  const getCustomizedLetterText = (templateText: string): string => {
+    return templateText
+      .replace(/{jméno}/g, letterCustName.trim() || '[Jméno]')
+      .replace(/{id_člena}/g, letterVIPId.trim() || '[ID člena]')
+      .replace(/{mentor_jméno}/g, letterMentorName.trim() || '[Jméno mentora]')
+      .replace(/{mentor_telefon}/g, letterMentorPhone.trim() || '[Telefon mentora]')
+      .replace(/{fb_skupina}/g, letterFBGroup.trim() || '[Uzavřená FB skupina]')
+      .replace(/{hlavni_produkt}/g, letterHeroProd.trim() || 'Bio Rehab')
+      .replace(/{novinka_line}/g, letterHeroProd.trim() || 'Bio Rehab')
+      .replace(/{uspora_kc}/g, letterSavingEst.trim() || '1 200')
+      .replace(/{mentor_kontakt}/g, letterMentorPhone.trim() || '[Email / Telefon mentora]');
+  };
 
   const responseEndRef = useRef<HTMLDivElement>(null);
 
@@ -235,35 +280,56 @@ Odpověz v čistém formátu Markdown.
   };
 
   return (
-    <div className="max-w-6xl mx-auto py-12 px-6 lg:px-10">
+    <div className="max-w-6xl mx-auto py-12 px-6 lg:px-10 animate-fade-in">
       {/* Upper header */}
       <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-rose-100 pb-8">
         <div>
           <span className="bg-rose-100 text-rose-700 text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full mb-4 inline-block">
-            Knihovna Vědomostí & Školicí středisko
+            {appMode === 'customer' ? 'Knihovna produktů & dárků' : 'Knihovna vědomostí & Školicí středisko'}
           </span>
           <h2 className="text-4xl lg:text-5xl font-light tracking-tight text-slate-800">
-            tianDe <span className="serif-italic text-rose-500">Knihovna lídra</span>
+            tianDe <span className="serif-italic text-rose-500">{appMode === 'customer' ? 'Bylinný wellness' : 'Knihovna lídra'}</span>
           </h2>
           <p className="text-slate-500 text-sm mt-2 max-w-2xl">
-            Váš kompletní digitální průvodce tajnými i certifikovanými recepturami altajských bylin a spolehlivým byznys modelem pro růst vaší tianDe struktury.
+            {appMode === 'customer' 
+              ? 'Objevte tajemství altajských bylin ucelených fytoprogramů a podívejte se, jaké dárky můžete zdarma získat za své De-coiny.' 
+              : 'Váš kompletní digitální průvodce tajnými i certifikovanými recepturami altajských bylin a spolehlivým byznys modelem pro růst vaší tianDe struktury.'}
           </p>
         </div>
 
         {/* Modular switcher tabs */}
-        <div className="bg-slate-100 p-1 rounded-lg flex self-start md:self-auto shrink-0">
+        <div className="bg-slate-100 p-1 rounded-lg flex flex-wrap gap-1 md:gap-0 select-none">
           <button 
             onClick={() => setActiveTab('products')}
-            className={`px-4 py-2 rounded text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 ${activeTab === 'products' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
+            className={`px-3.5 py-2 rounded text-[11px] font-black uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${activeTab === 'products' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-850'}`}
           >
-            <BookOpenText className="w-3.5 h-3.5 text-rose-500" /> Katalog produktových řad
+            <BookOpenText className="w-3.5 h-3.5 text-rose-500 font-bold" /> Produktové řady
           </button>
+          
+          {appMode === 'business' && (
+            <button 
+              onClick={() => setActiveTab('academy')}
+              className={`px-3.5 py-2 rounded text-[11px] font-black uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${activeTab === 'academy' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-850'}`}
+            >
+              <Book className="w-3.5 h-3.5 text-blue-500 font-bold" /> Škola byznysu
+            </button>
+          )}
+
           <button 
-            onClick={() => setActiveTab('academy')}
-            className={`px-4 py-2 rounded text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 ${activeTab === 'academy' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
+            onClick={() => setActiveTab('promotions')}
+            className={`px-3.5 py-2 rounded text-[11px] font-black uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${activeTab === 'promotions' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-850'}`}
           >
-            <Book className="w-3.5 h-3.5 text-blue-500" /> Business Akademie
+            <Gift className="w-3.5 h-3.5 text-emerald-500 font-bold" /> VIP Dárky & De-coiny
           </button>
+
+          {appMode === 'business' && (
+            <button 
+              onClick={() => setActiveTab('letters')}
+              className={`px-3.5 py-2 rounded text-[11px] font-black uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${activeTab === 'letters' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-850'}`}
+            >
+              <Mail className="w-3.5 h-3.5 text-amber-500 font-bold" /> Dopisy pro strukturu
+            </button>
+          )}
         </div>
       </header>
 
@@ -773,6 +839,452 @@ Odpověz v čistém formátu Markdown.
               </div>
             </div>
 
+          </motion.div>
+        )}
+
+        {/* TAB 3: CORPORATE PROMOTIONS AND DE-COINS */}
+        {activeTab === 'promotions' && (
+          <motion.div
+            key="promotions-tab"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.25 }}
+            className="space-y-6 w-full"
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* Left sidebar selector for promotions */}
+              <div className="lg:col-span-4 space-y-3">
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1 block mb-2">
+                  ZVOLTE FIREMNÍ PROGRAM
+                </span>
+                
+                {Object.values(CORPORATE_PROMOTIONS).map((promoItem) => {
+                  const isSelected = selectedPromoId === promoItem.id;
+                  return (
+                    <button
+                      key={promoItem.id}
+                      onClick={() => {
+                        setSelectedPromoId(promoItem.id);
+                        setCopiedText(null);
+                      }}
+                      className={`w-full text-left p-4 rounded-xl border transition-all flex items-center justify-between group cursor-pointer ${
+                        isSelected 
+                          ? 'bg-emerald-50/40 border-emerald-300 shadow-sm' 
+                          : 'bg-white border-slate-200/80 hover:bg-slate-50/50 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className={`text-[12px] font-black uppercase tracking-wider transition-colors ${
+                            isSelected ? 'text-emerald-700' : 'text-slate-700'
+                          }`}>
+                            {promoItem.title.split(' (')[0]}
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 block truncate max-w-[200px]">
+                          {promoItem.tagline}
+                        </span>
+                      </div>
+                      <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
+                        isSelected ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
+                      }`}>
+                        {promoItem.badge.split(' ')[0]}
+                      </span>
+                    </button>
+                  );
+                })}
+
+                {/* Additional promotional rules warning */}
+                <div className="bg-slate-900 text-white p-5 rounded-2xl border border-slate-800 relative overflow-hidden mt-4">
+                  <div className="relative z-10 space-y-2">
+                    <span className="bg-rose-500/20 text-rose-400 text-[8px] font-black uppercase tracking-[0.2em] px-2 py-0.5 rounded w-max block">Důležité pravidlo</span>
+                    <h5 className="font-bold text-xs uppercase tracking-widest text-rose-300">Aktivita nad 100 bodů</h5>
+                    <p className="text-[10px] text-slate-300 leading-relaxed font-normal">
+                      Všechny firemní motivační kampaně vyžadují vaši osobní aktivní účast (osobní nákup v daném měsíci ve výši min. 100 body, v některých je to 150 bodů). Dbejte na to, abyste své VIP konto pravidelně obsluhovali.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right promo panel */}
+              <div className="lg:col-span-8 space-y-6">
+                {(() => {
+                  const promo = CORPORATE_PROMOTIONS[selectedPromoId] || CORPORATE_PROMOTIONS.decoins;
+                  return (
+                    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                      <div className="bg-slate-50 border-b border-slate-100 p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                          <span className="bg-emerald-100 text-emerald-700 text-[8px] font-black uppercase tracking-[0.2em] px-2.5 py-1 rounded-full inline-block mb-2">
+                            {promo.badge} tianDe oficiální kampaně
+                          </span>
+                          <h3 className="text-2xl sm:text-3xl font-light text-slate-800">
+                            {promo.title}
+                          </h3>
+                          <p className="text-slate-400 text-xs italic mt-0.5">{promo.tagline}</p>
+                        </div>
+                      </div>
+
+                      <div className="p-6 sm:p-8 space-y-6">
+                        {/* Description */}
+                        <p className="text-slate-600 text-sm leading-relaxed">
+                          {promo.description}
+                        </p>
+
+                        {/* Split: Rules vs Steps */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="bg-emerald-50/10 border border-emerald-100 p-5 rounded-2xl space-y-3">
+                            <span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider flex items-center gap-1.5 border-b border-emerald-100 pb-2">
+                              📋 Základní pravidla hry:
+                            </span>
+                            <ul className="space-y-2">
+                              {promo.rules.map((rule, idx) => (
+                                <li key={idx} className="flex items-start gap-2 text-xs text-slate-600">
+                                  <span className="text-emerald-500 font-black">•</span>
+                                  <span>{rule}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          <div className="bg-blue-50/10 border border-blue-100 p-5 rounded-2xl space-y-3">
+                            <span className="text-[10px] font-black uppercase text-blue-800 tracking-wider flex items-center gap-1.5 border-b border-blue-100 pb-2">
+                              🚀 Krok za krokem k úspěchu:
+                            </span>
+                            <ol className="space-y-2.5">
+                              {promo.steps.map((step, idx) => (
+                                <li key={idx} className="flex gap-2 text-xs text-slate-600">
+                                  <span className="font-bold text-blue-500">{idx + 1}.</span>
+                                  <span>{step}</span>
+                                </li>
+                              ))}
+                            </ol>
+                          </div>
+                        </div>
+
+                        {/* Interactive De-coin Calculator for decoins promo */}
+                        {promo.id === 'decoins' && (
+                          <div className="bg-slate-50 rounded-xl border border-slate-200 p-5 space-y-4">
+                            <div className="flex justify-between items-center border-b border-slate-200 pb-2">
+                              <h4 className="text-xs font-black uppercase text-slate-700 flex items-center gap-1.5">
+                                <Calculator className="w-4 h-4 text-emerald-500" />
+                                Kalkulačka dárků za De-coiny
+                              </h4>
+                              <span className="text-[9px] bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 rounded-full uppercase">
+                                Interaktivní
+                              </span>
+                            </div>
+                            
+                            <p className="text-[11px] text-slate-500">
+                              Zadejte odhadovaný nebo reálný počet De-coinů vaší zákaznice, a ihned zjistíte, jaký hodnotný produkt u tianDe může dostat zcela zdarma!
+                            </p>
+
+                            <div className="space-y-3">
+                              <div className="flex items-center gap-4">
+                                <span className="text-xs font-bold text-slate-600 shrink-0">Moje body:</span>
+                                <input 
+                                  type="range" 
+                                  min="1" 
+                                  max="150" 
+                                  value={decoinCount}
+                                  onChange={(e) => setDecoinCount(parseInt(e.target.value))}
+                                  className="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                                />
+                                <input 
+                                  type="number" 
+                                  min="1" 
+                                  max="1000" 
+                                  value={decoinCount}
+                                  onChange={(e) => setDecoinCount(parseInt(e.target.value) || 0)}
+                                  className="w-16 bg-white border border-slate-200 p-1 rounded text-center text-xs font-mono font-bold"
+                                />
+                                <span className="text-xs font-bold text-slate-500">De-coinů</span>
+                              </div>
+
+                              {/* Target gift notification */}
+                              {(() => {
+                                const eligibleGifts = DECOINS_GIFTS.filter(g => g.threshold <= decoinCount);
+                                const nextGift = DECOINS_GIFTS.find(g => g.threshold > decoinCount);
+                                
+                                return (
+                                  <div className="bg-white border border-slate-100 rounded-xl p-4 space-y-3">
+                                    <div className="flex items-center gap-2">
+                                      <Gift className="w-5 h-5 text-pink-500" />
+                                      <span className="text-xs text-slate-700">
+                                        Při stavu <strong className="font-extrabold text-emerald-600">{decoinCount} De-coinů</strong> máte nárok na dárky v této úrovni:
+                                      </span>
+                                    </div>
+
+                                    {eligibleGifts.length > 0 ? (
+                                      <div className="space-y-1.5 pl-7 border-l-2 border-emerald-500">
+                                        {eligibleGifts.map((eg, i) => (
+                                          <div key={i} className="text-xs text-slate-800 font-semibold flex items-center gap-1.5">
+                                            <span className="text-emerald-500 font-bold">✓</span>
+                                            <span>
+                                              {eg.gift} <span className="text-slate-400 font-normal">({eg.valueEst})</span>
+                                            </span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <p className="text-xs text-rose-500 font-bold pl-7">Zatím nemáte dostatek bodů na nejnižší definovaný dárek (min. 10 bodů).</p>
+                                    )}
+
+                                    {nextGift && (
+                                      <div className="bg-rose-50/40 p-2.5 rounded-lg border border-rose-100 text-[10px] text-slate-500 pl-4 mt-2">
+                                        💡 Nasbírejte ještě <strong>{nextGift.threshold - decoinCount} De-coinů</strong> a získejte: <strong className="text-rose-700">{nextGift.gift}</strong> v odhadované hodnotě {nextGift.valueEst}!
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })()}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Advice & Expert Quotes */}
+                        <div className="p-4 bg-emerald-50/50 border border-emerald-100 rounded-xl flex items-start gap-3">
+                          <Info className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                          <div>
+                            <strong className="text-xs font-bold text-slate-900 block">Prodejní a propagační tip:</strong>
+                            <p className="text-[11px] text-emerald-700 leading-relaxed font-normal">{promo.proTip}</p>
+                          </div>
+                        </div>
+
+                        <div className="bg-slate-900 text-white p-5 rounded-xl flex items-center justify-between gap-4">
+                          <div className="space-y-1">
+                            <span className="text-[9px] font-black uppercase text-rose-400 block">Slovo mentora Ivany Nohovové:</span>
+                            <p className="text-xs italic text-slate-300">
+                              "{promo.expertQuote}"
+                            </p>
+                          </div>
+                          <div className="w-8 h-8 rounded-full bg-rose-500/10 border border-rose-500 flex items-center justify-center font-bold text-xs text-rose-300 shrink-0">IN</div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* TAB 4: LETTERS FOR THE STRUCTURE */}
+        {activeTab === 'letters' && (
+          <motion.div
+            key="letters-tab"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.25 }}
+            className="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full"
+          >
+            {/* Left sidebar selector for letter templates */}
+            <div className="lg:col-span-4 space-y-3">
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1 block mb-2">
+                DOPISY PRO STRUKTURU ({LETTERS_TEMPLATES.length})
+              </span>
+
+              {LETTERS_TEMPLATES.map((tmpl, idx) => {
+                const isSelected = selectedLetterIdx === idx;
+                return (
+                  <button
+                    key={tmpl.id}
+                    onClick={() => {
+                      setSelectedLetterIdx(idx);
+                      setCopiedText(null);
+                    }}
+                    className={`w-full text-left p-4 rounded-xl border transition-all relative overflow-hidden flex flex-col gap-1.5 cursor-pointer ${
+                      isSelected 
+                        ? 'bg-amber-50/15 border-amber-300 shadow-sm' 
+                        : 'bg-white border-slate-200/80 hover:bg-slate-50/50 hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span className={`text-xs font-black uppercase tracking-wider ${
+                        isSelected ? 'text-amber-800 font-black' : 'text-slate-700'
+                      }`}>
+                        {tmpl.title}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-slate-400 font-medium line-clamp-2">
+                      {tmpl.description}
+                    </p>
+                  </button>
+                );
+              })}
+
+              {/* Dynamic Placeholders Personalization Panel (Czech) */}
+              <div className="bg-slate-900 text-white rounded-2xl p-5 shadow-xl space-y-4 border border-slate-800 mt-4">
+                <h3 className="text-xs font-black uppercase tracking-widest text-slate-200 border-b border-slate-800 pb-2 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-emerald-400" />
+                  <span>Přizpůsobit dopisy</span>
+                </h3>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                      Oslovení zákazníka
+                    </label>
+                    <input 
+                      type="text" 
+                      value={letterCustName}
+                      onChange={(e) => setLetterCustName(e.target.value)}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-xs font-bold text-slate-100 focus:border-amber-400 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                      ID člena / VIP kód
+                    </label>
+                    <input 
+                      type="text" 
+                      value={letterVIPId}
+                      onChange={(e) => setLetterVIPId(e.target.value)}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-xs font-mono text-emerald-400 focus:border-amber-400 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                      Jméno lídra / mentora
+                    </label>
+                    <input 
+                      type="text" 
+                      value={letterMentorName}
+                      onChange={(e) => setLetterMentorName(e.target.value)}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-300 focus:border-amber-400 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                      Telefon / Kontakt
+                    </label>
+                    <input 
+                      type="text" 
+                      value={letterMentorPhone}
+                      onChange={(e) => setLetterMentorPhone(e.target.value)}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-300 focus:border-amber-400 focus:outline-none"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                      Název FB skupiny
+                    </label>
+                    <input 
+                      type="text" 
+                      value={letterFBGroup}
+                      onChange={(e) => setLetterFBGroup(e.target.value)}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-300 focus:border-amber-400 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                      Bylinná novinka / produkt
+                    </label>
+                    <input 
+                      type="text" 
+                      value={letterHeroProd}
+                      onChange={(e) => setLetterHeroProd(e.target.value)}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-300 focus:border-amber-400 focus:outline-none font-semibold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                      Předpokládaná úspora (Kč)
+                    </label>
+                    <input 
+                      type="text" 
+                      value={letterSavingEst}
+                      onChange={(e) => setLetterSavingEst(e.target.value)}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-xs font-mono text-emerald-400 focus:border-amber-400 focus:outline-none font-bold"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right preview and text area */}
+            <div className="lg:col-span-8 space-y-4">
+              {(() => {
+                const tmpl = LETTERS_TEMPLATES[selectedLetterIdx] || LETTERS_TEMPLATES[0];
+                const customizedText = getCustomizedLetterText(tmpl.text);
+                const customizedSubject = tmpl.subject.replace(/{jméno}/g, letterCustName);
+                
+                return (
+                  <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-500 to-orange-500" />
+                    
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-4">
+                      <div>
+                        <span className="bg-amber-100 text-amber-800 text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full inline-block">
+                          📧 Připravený e-mail
+                        </span>
+                        <h4 className="text-base font-black text-slate-800 uppercase mt-1">
+                          {tmpl.title}
+                        </h4>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(`Předmět: ${customizedSubject}\n\n${customizedText}`);
+                          setCopiedText(`letter-${tmpl.id}`);
+                          setTimeout(() => setCopiedText(null), 2000);
+                        }}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[10px] font-black uppercase tracking-wider transition-all shadow-sm cursor-pointer ${
+                          copiedText === `letter-${tmpl.id}`
+                            ? 'bg-green-600 border-green-600 text-white'
+                            : 'bg-slate-900 border-slate-900 text-white hover:bg-slate-800'
+                        }`}
+                      >
+                        {copiedText === `letter-${tmpl.id}` ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-green-200" />
+                            <span>Zkopírováno!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>Kopírovat dopis</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Email Subject preview bar */}
+                    <div className="bg-amber-50/30 border border-amber-100 rounded-xl p-3 flex justify-between items-center gap-3">
+                      <div className="text-xs">
+                        <span className="font-bold text-slate-500 mr-2 uppercase tracking-wide">Předmět:</span>
+                        <span className="font-extrabold text-slate-800">{customizedSubject}</span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(customizedSubject);
+                          setCopiedText(`subject-${tmpl.id}`);
+                          setTimeout(() => setCopiedText(null), 2000);
+                        }}
+                        className="text-[9px] text-slate-400 hover:text-amber-600 uppercase font-black tracking-wider transition-colors shrink-0 cursor-pointer"
+                      >
+                        {copiedText === `subject-${tmpl.id}` ? '✓ Zkopírováno' : 'Kopírovat předmět'}
+                      </button>
+                    </div>
+
+                    {/* Main scrollable text draft area */}
+                    <div className="bg-slate-50 border border-slate-100 rounded-xl p-5 sm:p-6 max-h-96 overflow-y-auto font-sans text-xs sm:text-xs leading-relaxed text-slate-700 whitespace-pre-wrap select-text selection:bg-amber-100">
+                      {customizedText}
+                    </div>
+
+                    {/* Coach guidance */}
+                    <div className="p-4 bg-amber-50/40 border border-amber-100 rounded-xl flex items-start gap-3">
+                      <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="text-xs font-bold text-slate-900 block font-serif italic">Strategická rada Lídra:</strong>
+                        <p className="text-[10px] text-amber-700 leading-relaxed font-normal">{tmpl.tips}</p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
           </motion.div>
         )}
 

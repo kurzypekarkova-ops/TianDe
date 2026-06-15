@@ -17,9 +17,19 @@ import {
   Wallet
 } from 'lucide-react';
 
-export const CalculatorPillar: React.FC = () => {
+interface CalculatorPillarProps {
+  defaultMode?: 'customer' | 'business';
+}
+
+export const CalculatorPillar: React.FC<CalculatorPillarProps> = ({ defaultMode = 'customer' }) => {
   // Tabs: 'customer' (Zákazník) or 'distributor' (Začínající distributor)
-  const [activeTab, setActiveTab] = useState<'customer' | 'distributor'>('customer');
+  const [activeTab, setActiveTab] = useState<'customer' | 'distributor'>(
+    defaultMode === 'business' ? 'distributor' : 'customer'
+  );
+
+  React.useEffect(() => {
+    setActiveTab(defaultMode === 'business' ? 'distributor' : 'customer');
+  }, [defaultMode]);
 
   // --- ZÁKAZNÍK (CUSTOMER) CALCULATIONS ---
   const [catalogPrice, setCatalogPrice] = useState<number>(3000); // in CZK
