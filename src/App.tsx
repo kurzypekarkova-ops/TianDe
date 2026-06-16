@@ -726,9 +726,24 @@ export default function App() {
                           <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider block mb-2">Zvolte svého TOP lídra pro odeslání žádosti</label>
                           <div className="grid grid-cols-3 gap-2.5">
                             {[
-                              { name: 'Ivana Nohavová', initials: 'IN', label: 'Ivana' },
-                              { name: 'Zuzana Grygier', initials: 'ZG', label: 'Zuzana' },
-                              { name: 'Marta Neumannová', initials: 'MN', label: 'Marta' }
+                              { 
+                                name: 'Ivana Nohavová', 
+                                initials: 'IN', 
+                                label: 'Ivana',
+                                image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200'
+                              },
+                              { 
+                                name: 'Zuzana Grygier', 
+                                initials: 'ZG', 
+                                label: 'Zuzana',
+                                image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=200&h=200'
+                              },
+                              { 
+                                name: 'Marta Neumannová', 
+                                initials: 'MN', 
+                                label: 'Marta',
+                                image: 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?auto=format&fit=crop&q=80&w=200&h=200'
+                              }
                             ].map((leader) => {
                               const isSelected = selectedLeader === leader.name;
                               return (
@@ -736,20 +751,25 @@ export default function App() {
                                   key={leader.name}
                                   type="button"
                                   onClick={() => setSelectedLeader(leader.name as any)}
-                                  className={`flex flex-col items-center justify-center p-3 rounded-2xl border transition-all text-center relative active:scale-95 cursor-pointer ${
+                                  className={`flex flex-col items-center justify-center p-3 rounded-2xl border transition-all text-center relative active:scale-95 cursor-pointer group ${
                                     isSelected 
                                       ? 'border-emerald-600 bg-emerald-50/10 font-bold ring-2 ring-emerald-600/20' 
-                                      : 'border-slate-200 bg-white text-slate-500 hover:bg-slate-55'
+                                      : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50/50'
                                   }`}
                                 >
-                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black text-white mb-2 shadow-sm ${
-                                    leader.initials === 'IN' ? 'bg-emerald-600' : leader.initials === 'ZG' ? 'bg-pink-600' : 'bg-indigo-600'
+                                  <div className={`w-12 h-12 rounded-full overflow-hidden mb-2 shadow-sm border-2 shrink-0 transition-transform ${
+                                    isSelected ? 'border-emerald-500 scale-105' : 'border-slate-100 group-hover:scale-105'
                                   }`}>
-                                    {leader.initials}
+                                    <img 
+                                      src={leader.image} 
+                                      alt={leader.name} 
+                                      className="w-full h-full object-cover"
+                                      referrerPolicy="no-referrer"
+                                    />
                                   </div>
-                                  <p className="text-[9px] font-black leading-tight">{leader.name}</p>
+                                  <p className="text-[10px] font-black leading-tight text-slate-800">{leader.name}</p>
                                   {isSelected && (
-                                    <div className="absolute top-1.5 right-1.5 w-3.5 h-3.5 rounded-full bg-emerald-600 text-white flex items-center justify-center scale-100">
+                                    <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center scale-100 shadow">
                                       <Check className="w-2.5 h-2.5" />
                                     </div>
                                   )}
