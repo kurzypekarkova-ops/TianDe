@@ -15,7 +15,10 @@ import {
   ArrowRight, 
   FileText, 
   Share2,
-  ListRestart
+  ListRestart,
+  User,
+  Clock,
+  ClipboardList
 } from 'lucide-react';
 import { skinCareMaterials, ProductMaterial } from '../data/skinCareProducts';
 import { hairCareMaterials } from '../data/hairCareProducts';
@@ -35,6 +38,7 @@ interface DomainConfig {
   colorClass: string;
   bgLightClass: string;
   borderColorClass: string;
+  symptoms: string[];
   questions: {
     id: string;
     text: string;
@@ -57,6 +61,7 @@ const DOMAINS: DomainConfig[] = [
     colorClass: 'text-pink-600',
     bgLightClass: 'bg-pink-50/50',
     borderColorClass: 'border-pink-100',
+    symptoms: ['Suchost & pnutí', 'Vrásky & ochabování', 'Akné & černé tečky', 'Citlivá pleť'],
     questions: [
       {
         id: 'skin_type',
@@ -141,6 +146,7 @@ const DOMAINS: DomainConfig[] = [
     colorClass: 'text-indigo-600',
     bgLightClass: 'bg-indigo-50/50',
     borderColorClass: 'border-indigo-100',
+    symptoms: ['Padání vlasů', 'Lupy & svědění pokožky', 'Suché & matné délky', 'Třepení konečků'],
     questions: [
       {
         id: 'hair_problem',
@@ -195,6 +201,7 @@ const DOMAINS: DomainConfig[] = [
     colorClass: 'text-rose-600',
     bgLightClass: 'bg-rose-50/50',
     borderColorClass: 'border-rose-100',
+    symptoms: ['Nepravidelná menstruace', 'Mykózy, kvasinky & výtoky', 'Hormonální nerovnováha', 'Prevence & svěžest'],
     questions: [
       {
         id: 'womens_focus',
@@ -231,6 +238,7 @@ const DOMAINS: DomainConfig[] = [
     colorClass: 'text-emerald-600',
     bgLightClass: 'bg-emerald-50/50',
     borderColorClass: 'border-emerald-100',
+    symptoms: ['Bolesti kloubů & zad', 'Celulitida & otoky', 'Detoxikace organismu', 'Chronická únava'],
     questions: [
       {
         id: 'body_need',
@@ -267,6 +275,7 @@ const DOMAINS: DomainConfig[] = [
     colorClass: 'text-sky-600',
     bgLightClass: 'bg-sky-50/50',
     borderColorClass: 'border-sky-100',
+    symptoms: ['Krvácející dásně', 'Zápach z úst', 'Zubní plak & kámen', 'Citlivá sklovina'],
     questions: [
       {
         id: 'dental_problem',
@@ -300,6 +309,7 @@ export const DiagnosisPillar: React.FC = () => {
   const [showResults, setShowResults] = useState(false);
   const [savedRecipes, setSavedRecipes] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'quiz' | 'recipes'>('quiz');
+  const [resultSubTab, setResultSubTab] = useState<'products' | 'report'>('products');
 
   // Copy states
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -683,64 +693,92 @@ export const DiagnosisPillar: React.FC = () => {
         </motion.div>
       ) : !activeDomain ? (
         // ----------------- STEP 1: Select Diagnostic Domain -----------------
-        <div className="space-y-8">
-          <div className="bg-slate-900 text-white p-8 lg:p-12 rounded-2xl relative overflow-hidden shadow-xl">
-            <div className="absolute top-0 right-0 p-8 pointer-events-none opacity-10">
-              <Sparkles className="w-64 h-64 text-white" />
-            </div>
-            <div className="max-w-xl">
-              <span className="bg-blue-600/30 border border-blue-500/20 text-blue-300 text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full mb-6 inline-block">
-                Klientská Péče na míru
+        <div className="space-y-6">
+          <div className="bg-gradient-to-r from-emerald-50/40 via-blue-50/20 to-pink-50/20 border border-slate-200/80 p-6 lg:p-8 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.01)] text-slate-800 flex flex-col md:flex-row gap-6 justify-between items-center">
+            <div className="flex-1 space-y-1">
+              <span className="text-[10px] text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">
+                Fytoterapeutický asistent tianDe
               </span>
-              <h3 className="text-3xl lg:text-4xl font-extralight tracking-tight mt-2 mb-4 leading-snug">
-                Vyberte oblast pro <span className="serif-italic text-blue-300">cílenou diagnostiku</span>
+              <h3 className="text-2xl font-bold tracking-tight text-slate-800 mt-2">
+                Inteligentní klientská diagnostika
               </h3>
-              <p className="text-slate-300 text-xs lg:text-sm leading-relaxed mb-6">
-                Chcete-li klientovi navrhnout přesný fytorecept (osobní bylinný recept doporučených produktů na základě analýzy potřeb) tianDe, vyberte jednu ze specializovaných sekcí. Kvíz má jen 1 až 3 intuitivní otázky, se kterými ihned odhalíte pravou příčinu potíží pleti, dásní, vlasů či kloubů.
+              <p className="text-slate-500 text-xs leading-relaxed max-w-xl">
+                Vyberte specializovanou sekci podle potíží vašeho zákazníka. Během několika kliknutí odhalíte příčiny a vytvoříte cílenou bylinnou kúru s hotovou zprávou k okamžitému odeslání.
               </p>
-              <div className="flex flex-col sm:flex-row items-center gap-4">
-                <div className="w-full sm:w-auto">
-                  <label className="block text-[10px] font-bold text-blue-200 uppercase tracking-wider mb-1.5">Jméno zákazníka (volitelné):</label>
-                  <input 
-                    type="text" 
-                    placeholder="Např. paní Jana"
-                    value={clientName}
-                    onChange={(e) => setClientName(e.target.value)}
-                    className="bg-white/10 border border-white/20 text-white text-xs px-4 py-2.5 rounded-lg w-full sm:w-64 outline-none focus:border-white/40 transition-colors"
-                  />
-                </div>
+            </div>
+
+            <div className="w-full md:w-auto p-5 bg-white border border-slate-200/60 rounded-xl shadow-sm shrink-0 flex items-center gap-3">
+              <div className="p-2.5 bg-emerald-50 rounded-lg text-emerald-600">
+                <User className="w-5 h-5" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">1. Jméno zákazníka (volitelné):</label>
+                <input 
+                  type="text" 
+                  placeholder="např. paní Alena"
+                  value={clientName}
+                  onChange={(e) => setClientName(e.target.value)}
+                  className="mt-1 bg-slate-50 border border-slate-200 text-slate-800 text-xs px-3 py-2 rounded-md w-[180px] outline-none focus:border-emerald-500/50 focus:bg-white transition-all font-semibold"
+                />
               </div>
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {DOMAINS.map((domain) => (
-              <motion.button
-                whileHover={{ y: -3 }}
-                key={domain.id}
-                onClick={() => handleDomainSelect(domain)}
-                className="bg-white border border-slate-200 p-6 rounded-xl text-left shadow-sm hover:shadow-lg transition-all group hover:border-slate-300"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`p-3 rounded-lg ${domain.bgLightClass} border ${domain.borderColorClass}`}>
-                    {domain.icon}
+          <div>
+            <h3 className="text-xs uppercase font-black tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+              <ClipboardList className="w-4 h-4 text-emerald-500" />
+              <span>2. Vyberte oblast podle příznaků klienta:</span>
+            </h3>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {DOMAINS.map((domain) => (
+                <motion.button
+                  whileHover={{ y: -3 }}
+                  key={domain.id}
+                  onClick={() => handleDomainSelect(domain)}
+                  className="bg-white border border-slate-200/85 p-6 rounded-2xl text-left shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-md transition-all group hover:border-slate-300 flex flex-col justify-between h-full"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className={`p-3 rounded-xl ${domain.bgLightClass} border ${domain.borderColorClass}`}>
+                        {domain.icon}
+                      </div>
+                      <div className="w-7 h-7 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all text-slate-600">
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                      </div>
+                    </div>
+                    <h4 className="font-bold text-[13px] text-slate-800 uppercase tracking-wider mb-1">
+                      {domain.title}
+                    </h4>
+                    <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
+                      {domain.subtitle}
+                    </p>
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-                    <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-800" />
+
+                  <div>
+                    {/* Highlight symptoms list for instant guidance */}
+                    <div className="mt-4 pt-3 border-t border-slate-100/80">
+                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-2">Časté potíže sekce:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {domain.symptoms.map((symptom, i) => (
+                          <span 
+                            key={i} 
+                            className="text-[9px] font-semibold text-slate-600 bg-slate-50 border border-slate-100/80 px-2 py-0.5 rounded"
+                          >
+                            {symptom}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex items-center gap-1.5 text-[10px] font-black uppercase text-tiande-blue tracking-wider group-hover:text-blue-700 transition-colors">
+                      <span>Spustit diagnostiku</span>
+                      <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </div>
                   </div>
-                </div>
-                <h4 className="font-bold text-sm text-slate-800 uppercase tracking-wider mb-1">
-                  {domain.title}
-                </h4>
-                <p className="text-xs text-slate-400 font-medium">
-                  {domain.subtitle}
-                </p>
-                <div className="mt-4 flex items-center gap-1 text-[10px] font-black uppercase text-slate-400 tracking-wider">
-                  <span>Spustit test</span>
-                  <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </motion.button>
-            ))}
+                </motion.button>
+              ))}
+            </div>
           </div>
         </div>
       ) : !showResults ? (
@@ -748,17 +786,30 @@ export const DiagnosisPillar: React.FC = () => {
         <motion.div 
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-10 shadow-sm max-w-2xl mx-auto"
+          className="bg-white border border-slate-200/80 rounded-2xl p-6 lg:p-10 shadow-sm max-w-2xl mx-auto"
         >
+          {/* Active Context Ribbon */}
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4 mb-6">
+            <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+              <span className={`w-2.5 h-2.5 rounded-full ${activeDomain.colorClass.replace('text-', 'bg-')}`} />
+              <span className="uppercase tracking-wider text-[11px] text-slate-500">{activeDomain.title}</span>
+            </div>
+            
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100/50 text-emerald-800 text-[10px] font-bold">
+              <User className="w-3 h-3 text-emerald-600" />
+              <span>Profil: {clientName.trim() || 'Nový zákazník'}</span>
+            </div>
+          </div>
+
           {/* Progress bar */}
           <div className="mb-8">
             <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-slate-400 mb-2">
-              <span>Sekce: {activeDomain.title}</span>
               <span>Otázka {currentQuestionIndex + 1} z {activeDomain.questions.length}</span>
+              <span>{Math.round(((currentQuestionIndex) / activeDomain.questions.length) * 100)}% splněno</span>
             </div>
             <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
               <div 
-                className="bg-tiande-blue h-full transition-all duration-300" 
+                className="bg-emerald-500 h-full transition-all duration-300" 
                 style={{ width: `${((currentQuestionIndex + 1) / activeDomain.questions.length) * 100}%` }}
               />
             </div>
@@ -770,9 +821,9 @@ export const DiagnosisPillar: React.FC = () => {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.15 }}
             >
-              <h3 className="text-xl lg:text-2xl font-light tracking-tight text-slate-800 mb-6">
+              <h3 className="text-lg lg:text-xl font-bold tracking-tight text-slate-800 mb-6 leading-snug">
                 {activeDomain.questions[currentQuestionIndex].text}
               </h3>
 
@@ -781,19 +832,19 @@ export const DiagnosisPillar: React.FC = () => {
                   <button
                     key={option.id}
                     onClick={() => handleAnswerSelect(activeDomain.questions[currentQuestionIndex].id, option.id)}
-                    className="w-full border border-slate-200 hover:border-tiande-blue bg-white/50 hover:bg-slate-50/50 p-4 rounded-xl text-left transition-all hover:scale-[1.005] group"
+                    className="w-full border border-slate-200/90 hover:border-emerald-500/80 bg-white hover:bg-emerald-50/5 p-4 rounded-xl text-left transition-all hover:scale-[1.005] group shadow-sm hover:shadow-md"
                   >
                     <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-bold text-xs uppercase tracking-wider text-slate-800 group-hover:text-tiande-blue transition-colors">
+                      <div className="pr-4">
+                        <p className="font-bold text-xs uppercase tracking-wider text-slate-800 group-hover:text-emerald-700 transition-colors">
                           {option.text}
                         </p>
-                        <p className="text-xs text-slate-400 font-medium mt-1">
+                        <p className="text-[11px] text-slate-400 font-medium mt-1 leading-relaxed">
                           {option.desc}
                         </p>
                       </div>
-                      <div className="w-5 h-5 rounded-full border border-slate-200 flex items-center justify-center shrink-0 group-hover:border-tiande-blue/50">
-                        <div className="w-2 h-2 rounded-full bg-tiande-blue opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="w-5 h-5 rounded-full border border-slate-200 flex items-center justify-center shrink-0 group-hover:border-emerald-500">
+                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                     </div>
                   </button>
@@ -807,10 +858,10 @@ export const DiagnosisPillar: React.FC = () => {
               onClick={handleReset}
               className="flex items-center gap-1 hover:text-slate-800 transition-colors uppercase tracking-wider"
             >
-              <RotateCcw className="w-4 h-4" />
-              <span>Zpět na výběr</span>
+              <RotateCcw className="w-4 h-4 text-emerald-500" />
+              <span>Zpět na výběr sekce</span>
             </button>
-            <span>Ivana Nohovová • TianDe Fytorecept (bylinná doporučení na míru)</span>
+            <span className="text-[10px] uppercase font-black tracking-widest text-slate-300">tianDe Fytodiagnostika</span>
           </div>
         </motion.div>
       ) : (
@@ -821,97 +872,141 @@ export const DiagnosisPillar: React.FC = () => {
           className="space-y-8"
         >
           {/* Result Prescription Hero */}
-          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 lg:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-sm">
+          <div className="bg-gradient-to-r from-emerald-50/30 via-slate-50 to-pink-50/10 border border-slate-200 rounded-2xl p-6 lg:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-sm">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="bg-pink-100 text-pink-700 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded">
-                  Analýza hotova
+                <span className="bg-emerald-100 text-emerald-800 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded">
+                  Analýza dokončena
                 </span>
                 <span className="text-slate-400 text-xs">•</span>
-                <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Diagnostika: {activeDomain.title}</p>
+                <p className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">Metoda: {activeDomain.title}</p>
               </div>
-              <h3 className="text-2xl font-light tracking-tight text-slate-800">
-                Připraveno pro: <span className="serif-italic text-pink-500 font-normal">{clientName.trim() || 'Zákazníka'}</span>
+              <h3 className="text-2xl font-bold tracking-tight text-slate-800">
+                Fytorecept pro: <span className="serif-italic text-emerald-600 font-normal">{clientName.trim() || 'Váženého zákazníka'}</span>
               </h3>
               <p className="text-slate-500 text-xs mt-1 max-w-xl">
-                Sestavili jsme personalizovaný bylinný recept doporučených fytoterapeutických produktů tianDe. Níže naleznete přesné vysvětlení volby, sítě pro kopírování i hotový report, který můžete rovnou odeslat zákazníkovi!
+                Na základě zadaných indicií jsme sestavili optimální bylinnou kúru tianDe. Níže naleznete detailní přehled produktů a předpřipravenou osobní zprávu pro klienta.
               </p>
             </div>
 
             <div className="flex items-center gap-3 w-full md:w-auto shrink-0">
               <button 
                 onClick={handleCopyFytorecept}
-                className="w-full md:w-auto flex items-center justify-center gap-2 px-5 py-3 bg-slate-900 border border-slate-900 hover:opacity-95 text-white rounded text-xs font-bold uppercase tracking-widest transition-all shadow-md active:scale-95"
+                className="w-full md:w-auto flex items-center justify-center gap-2 px-5 py-3 bg-emerald-600 border border-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold uppercase tracking-widest transition-all shadow-md active:scale-95"
               >
                 {copiedRecipe ? (
                   <>
-                    <Check className="w-4 h-4 text-green-400" />
-                    <span className="text-white">Zkopírováno!</span>
+                    <Check className="w-4 h-4 text-emerald-100 animate-bounce" />
+                    <span>Zkopírováno!</span>
                   </>
                 ) : (
                   <>
                     <Share2 className="w-4 h-4" />
-                    <span>Zkopírovat report pro klienta</span>
+                    <span>Zkopírovat celou zprávu</span>
                   </>
                 )}
               </button>
               <button 
                 onClick={handleReset}
-                className="px-4 py-3 bg-white border border-slate-200 hover:border-slate-300 rounded text-slate-500 hover:text-slate-700 transition-colors"
-                title="Spustit znovu"
+                className="px-4 py-3 bg-white border border-slate-200 hover:border-slate-300 rounded-lg text-slate-500 hover:text-slate-700 transition-colors flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider shrink-0"
+                title="Sestavit novou diagnostiku"
               >
                 <ListRestart className="w-4 h-4" />
+                <span className="hidden sm:inline">Nová analýza</span>
               </button>
             </div>
           </div>
 
-          <div className="grid lg:grid-cols-12 gap-8">
-            {/* Left box: Prescribed products with customized "Why" and details */}
-            <div className="lg:col-span-8 space-y-6">
-              <h3 className="label-caps !text-slate-800">Doporučené Fyto-Přípravky (nejvyšší skóre)</h3>
-              
-              <div className="space-y-4">
-                {recommendedList.map((rec, index) => (
-                  <div key={rec.product.id} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col md:flex-row items-start justify-between gap-6 hover:border-slate-300 transition-all">
-                    <div className="flex-1 space-y-3">
-                      <div>
-                        <div className="flex items-center gap-3">
-                          <span className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-500 shrink-0">
-                            {index + 1}
-                          </span>
-                          <h4 className="font-bold text-sm text-slate-800 uppercase tracking-wider">{rec.product.name}</h4>
+          {/* Clean Sub-navigation inside Results to eliminate visually cluttered split columns */}
+          <div className="flex border-b border-slate-200">
+            <button
+              onClick={() => setResultSubTab('products')}
+              className={`flex items-center gap-2 px-6 py-3.5 border-b-2 font-bold text-xs uppercase tracking-wider transition-all -mb-px ${
+                resultSubTab === 'products'
+                  ? 'border-emerald-600 text-emerald-800 bg-emerald-50/10'
+                  : 'border-transparent text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              <ClipboardList className="w-4 h-4" />
+              <span>🌿 1. Doporučená fytokúra ({recommendedList.length} přípravky)</span>
+            </button>
+            <button
+              onClick={() => setResultSubTab('report')}
+              className={`flex items-center gap-2 px-6 py-3.5 border-b-2 font-bold text-xs uppercase tracking-wider transition-all -mb-px relative ${
+                resultSubTab === 'report'
+                  ? 'border-emerald-600 text-emerald-800 bg-emerald-50/10'
+                  : 'border-transparent text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              <FileText className="w-4 h-4" />
+              <span>💬 2. Hotová zpráva pro klienta</span>
+              <span className="absolute top-2 right-2 flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-pink-500"></span>
+              </span>
+            </button>
+          </div>
+
+          <div className="max-w-4xl mx-auto">
+            {resultSubTab === 'products' ? (
+              // SUB-TAB A: PRODUCT SHEETS
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs uppercase font-extrabold tracking-widest text-slate-400">
+                    Složení doporučené bylinné kúry na míru
+                  </h4>
+                  <span className="text-[10px] text-slate-400 font-medium">Klikněte na detaily pro hlubší edukační kartu</span>
+                </div>
+
+                <div className="space-y-4">
+                  {recommendedList.map((rec, index) => (
+                    <div key={rec.product.id} className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.01)] flex flex-col md:flex-row items-stretch justify-between gap-6 hover:border-slate-300 transition-all">
+                      <div className="flex-1 space-y-4 flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-center gap-3">
+                            <span className="w-6 h-6 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-xs font-bold text-emerald-700 shrink-0">
+                              {index + 1}
+                            </span>
+                            <h4 className="font-extrabold text-sm text-slate-800 uppercase tracking-wider">{rec.product.name}</h4>
+                          </div>
+                          
+                          <div className="flex items-center gap-2 mt-2 ml-9">
+                            <span className="text-[9px] font-bold text-tiande-blue bg-blue-50/50 border border-blue-100/60 px-2 py-0.5 rounded">
+                              Kód: {rec.product.code}
+                            </span>
+                            <span className="text-slate-200 text-xs">|</span>
+                            <span className="text-[10px] text-slate-400 font-medium font-mono">Expert doporučení</span>
+                          </div>
                         </div>
-                        <p className="text-[11px] font-bold text-tiande-blue uppercase tracking-widest mt-1.5 ml-9">
-                          Kód: {rec.product.code}
-                        </p>
+
+                        {/* Why we recommend badge */}
+                        <div className="bg-gradient-to-br from-emerald-50/20 to-slate-50/50 border border-emerald-100/40 rounded-xl p-4 ml-0 md:ml-9 space-y-1.5 shadow-[inset_0_1px_3px_rgba(0,0,0,0.01)]">
+                          <div className="flex items-center gap-1.5 text-[10px] uppercase font-black text-emerald-800 tracking-wider">
+                            <Award className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
+                            <span>Proč doporučujeme na míru:</span>
+                          </div>
+                          <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                            {rec.why}
+                          </p>
+                        </div>
+
+                        <div className="text-xs text-slate-500 font-medium ml-0 md:ml-9 leading-relaxed bg-slate-50/20 p-3 rounded-lg border border-slate-100">
+                          <span className="font-black text-[9px] text-slate-400 uppercase tracking-wider block mb-1">Popis přípravku:</span>
+                          {rec.product.shortDesc}
+                        </div>
                       </div>
 
-                      <div className="bg-slate-50/50 border border-slate-100 rounded p-4 ml-9 space-y-2">
-                        <div className="flex items-center gap-1 text-[10px] uppercase font-black text-slate-400 tracking-wider">
-                          <Award className="w-3.5 h-3.5 text-pink-500" />
-                          <span>Proč doporučujeme na míru:</span>
-                        </div>
-                        <p className="text-xs text-slate-600 font-medium leading-relaxed">
-                          {rec.why}
-                        </p>
-                      </div>
-
-                      <p className="text-xs text-slate-400 font-medium ml-9 leading-relaxed">
-                        <span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider block mb-1">Stručný popis přípravku:</span>
-                        {rec.product.shortDesc}
-                      </p>
-
-                      <div className="flex flex-wrap gap-2 pt-2 ml-9">
+                      <div className="md:w-[220px] shrink-0 border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-6 flex flex-row md:flex-col justify-center gap-2 items-stretch">
                         <button 
                           onClick={() => setSelectedProductDetails(rec.product)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded text-[11px] font-bold uppercase tracking-wider text-slate-600 hover:bg-slate-50 transition-colors"
+                          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 bg-white border border-slate-200 hover:border-slate-300 rounded-lg text-xs font-bold uppercase tracking-wider text-slate-600 hover:bg-slate-50 transition-colors shadow-sm"
                         >
-                          <BookOpen className="w-3.5 h-3.5" />
-                          <span>Přečíst edukační kartu</span>
+                          <BookOpen className="w-3.5 h-3.5 text-slate-400" />
+                          <span>Otevřít detaily</span>
                         </button>
                         <button 
                           onClick={() => handleCopyProductPost(rec.product.copyablePost, rec.product.id)}
-                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded border text-[11px] font-bold uppercase tracking-wider transition-all ${
+                          className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg border text-xs font-bold uppercase tracking-wider transition-all shadow-sm ${
                             copiedId === rec.product.id 
                             ? 'bg-green-50 border-green-200 text-green-700' 
                             : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100/55'
@@ -919,52 +1014,72 @@ export const DiagnosisPillar: React.FC = () => {
                         >
                           {copiedId === rec.product.id ? (
                             <>
-                              <Check className="w-3.5 h-3.5" />
-                              <span>Hotovo (Zkopírováno vč. tagů)</span>
+                              <Check className="w-3.5 h-3.5 text-green-600" />
+                              <span>Zkopírováno!</span>
                             </>
                           ) : (
                             <>
-                              <Copy className="w-3.5 h-3.5" />
-                              <span>Zkopírovat hotový post</span>
+                              <Copy className="w-3.5 h-3.5 text-slate-400" />
+                              <span>Okopírovat pro sítě</span>
                             </>
                           )}
                         </button>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-
-            {/* Right side box: Live Text Report for easy copy/paste */}
-            <div className="lg:col-span-4 space-y-6">
-              <h3 className="label-caps !text-slate-800">Náhled Fytoreceptu (seznam doporučených bylinných fytoproduktů)</h3>
-              <div className="bg-slate-900 text-slate-100 rounded-xl p-6 shadow-xl font-mono relative">
-                <div className="absolute top-4 right-4">
+            ) : (
+              // SUB-TAB B: CLIENT PERSONAL REPORT (THE LETTER PRESCRIPTION VIEW)
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h4 className="text-xs uppercase font-extrabold tracking-widest text-slate-400">
+                      Osobní report k odeslání do chatu
+                    </h4>
+                    <p className="text-[11px] text-slate-400 mt-0.5">Tento text je naformátovaný tak, abyste jej mohli rovnou zkopírovat na WhatsApp, Messenger nebo SMS.</p>
+                  </div>
+                  
                   <button 
                     onClick={handleCopyFytorecept}
-                    className="p-2 bg-white/10 hover:bg-white/20 text-white rounded transition-colors"
-                    title="Zkopírovat celoslitový text"
+                    className="flex items-center justify-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm transition-colors whitespace-nowrap"
                   >
-                    {copiedRecipe ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                    {copiedRecipe ? (
+                      <>
+                        <Check className="w-4 h-4 text-emerald-100" />
+                        <span>Text zkopírován!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4" />
+                        <span>Kopírovat celý text fytoreceptu</span>
+                      </>
+                    )}
                   </button>
                 </div>
-                
-                <pre className="text-[10px] leading-relaxed whitespace-pre-wrap overflow-x-auto max-h-[420px] overflow-y-auto pr-2 font-mono scrollbar-thin scrollbar-thumb-white/10">
-                  {generateFytoreceptText(clientName)}
-                </pre>
-              </div>
-              
-              <div className="bg-pink-50/50 border border-pink-100/80 p-5 rounded-lg flex gap-3">
-                <Heart className="w-5 h-5 text-pink-600 shrink-0 mt-0.5 animate-pulse" />
-                <div className="space-y-1">
-                  <h4 className="font-bold text-xs uppercase tracking-wider text-pink-900">Uloženo do paměti aplikace!</h4>
-                  <p className="text-[11px] text-pink-700 leading-relaxed font-medium">
-                    Tento report je nyní uložen v záložce "Uložené Recepty" nahoře. Můžete se k němu kdykoliv v průběhu dne vrátit, opětovně ho zkopírovat nebo editovat jméno.
-                  </p>
+
+                <div className="bg-amber-50/20 border border-amber-100/70 rounded-2xl p-6 lg:p-8 shadow-[inset_0_2px_8px_rgba(0,0,0,0.015)] relative">
+                  <div className="absolute top-4 right-4 text-[10px] text-amber-500 font-bold uppercase tracking-widest bg-amber-50 px-2 py-1 rounded border border-amber-100">
+                    Náhled zprávy
+                  </div>
+                  
+                  <div className="max-h-[460px] overflow-y-auto pr-2 font-mono text-[11.5px] leading-relaxed text-slate-700 whitespace-pre-wrap bg-white rounded-xl border border-slate-100 p-5 shadow-sm scrollbar-thin">
+                    {generateFytoreceptText(clientName)}
+                  </div>
+                </div>
+
+                {/* Local Storage Auto-saved card notification */}
+                <div className="bg-pink-50/30 border border-pink-100/60 p-5 rounded-2xl flex gap-3.5">
+                  <Heart className="w-5 h-5 text-pink-500 shrink-0 mt-0.5 animate-pulse" />
+                  <div className="space-y-1">
+                    <h4 className="font-extrabold text-xs uppercase tracking-wider text-pink-900">Uloženo do paměti aplikace!</h4>
+                    <p className="text-[11px] text-pink-700/90 leading-relaxed font-semibold">
+                      Tento fytorecept byl automaticky zaznamenán do místního úložiště. Kdykoliv se k němu vrátíte nahoře v sekci <span className="underline cursor-pointer font-bold" onClick={() => setActiveTab('recipes')}>"Uložené Recepty"</span> pro opětovné zkopírování či kontrolu.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </motion.div>
       )}

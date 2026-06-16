@@ -28,6 +28,8 @@ interface SidebarProps {
   setActivePillar: (pillar: Pillar) => void;
   appMode: 'customer' | 'business';
   setAppMode: (mode: 'customer' | 'business') => void;
+  currentUser?: { registrationId: string; name: string; role: string; roleLabel?: string } | null;
+  onLogout?: () => void;
 }
 
 interface ItemDetail {
@@ -97,7 +99,7 @@ const businessGroups: GroupDetail[] = [
   }
 ];
 
-export const Sidebar: React.FC<SidebarProps> = ({ activePillar, setActivePillar, appMode, setAppMode }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ activePillar, setActivePillar, appMode, setAppMode, currentUser, onLogout }) => {
   const [isOpen, setIsOpen] = React.useState(window.innerWidth >= 1024);
 
   const handleModeSwitch = (mode: 'customer' | 'business') => {
@@ -348,6 +350,31 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePillar, setActivePillar,
             </div>
 
           </nav>
+
+          {/* PERSISTENT ACTIVE USER BADGE */}
+          {currentUser && (
+            <div className="mx-4 mb-2 p-3 border border-emerald-100 rounded-xl bg-emerald-50/20 select-none">
+              <span className="text-[7.5px] font-black uppercase tracking-widest text-emerald-650 block mb-1">Aktivní uživatel</span>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-6.5 h-6.5 rounded-full bg-emerald-600 text-white text-[9px] font-black flex items-center justify-center">
+                    {currentUser.name.split(' ').map((n: string) => n[0]).join('')}
+                  </div>
+                  <div className="leading-tight">
+                    <p className="text-[10px] font-black text-slate-800 truncate max-w-[120px]" title={currentUser.name}>{currentUser.name}</p>
+                    <p className="text-[8px] font-semibold text-slate-400">ID: {currentUser.registrationId}</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={onLogout}
+                  className="text-[8px] font-black uppercase tracking-wider text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100/80 px-2 py-1 rounded transition-all cursor-pointer shrink-0"
+                  title="Odhlásit se z aplikace"
+                >
+                  Odhlásit
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* PERSISTENT TOP LEADER STATS CARD */}
           <div className="p-4 border-t border-slate-100 select-none">
