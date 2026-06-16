@@ -653,6 +653,50 @@ export default function App() {
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
 
+                  {/* Nejste ještě zaregistrovaní / První přihlášení s fotkami leaderů */}
+                  <div className="p-4 rounded-2xl bg-amber-50/40 border border-amber-100/60 text-slate-800">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                      <h4 className="text-[10px] font-black uppercase text-amber-800 tracking-wider">Přihlašujete se poprvé a nemáte PIN?</h4>
+                    </div>
+                    <p className="text-[11px] text-slate-500 leading-relaxed mb-3">
+                      Klikněte nahoře na záložku <span className="font-bold text-slate-700">"Nová žádost (PIN)"</span> nebo klikněte přímo na jednoho z našich 3 TOP lídrů níže pro spuštění žádosti:
+                    </p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { 
+                          name: 'Ivana Nohavová', 
+                          image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200'
+                        },
+                        { 
+                          name: 'Zuzana Grygier', 
+                          image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=200&h=200'
+                        },
+                        { 
+                          name: 'Marta Neumannová', 
+                          image: 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?auto=format&fit=crop&q=80&w=200&h=200'
+                        }
+                      ].map((leader) => (
+                        <div 
+                          key={leader.name} 
+                          onClick={() => {
+                            setLoginTab('request');
+                            setSelectedLeader(leader.name as any);
+                          }}
+                          className="flex items-center gap-2 p-1.5 rounded-xl bg-white border border-slate-200/60 hover:border-emerald-500 cursor-pointer transition-all active:scale-95 text-left group"
+                        >
+                          <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-slate-100 group-hover:scale-105 transition-transform">
+                            <img src={leader.image} alt={leader.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[8px] font-black uppercase tracking-wider text-slate-400 leading-none">Lídr</p>
+                            <p className="text-[10px] font-bold text-slate-700 truncate leading-tight mt-0.5">{leader.name.split(' ')[0]}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                   {/* VIP Quick-Testing Collapsible Panel */}
                   <div className="pt-2 border-t border-slate-100">
                     <details className="group cursor-pointer">
